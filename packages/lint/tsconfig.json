@@ -1,10 +1,6 @@
 {
   "extends": "tsconfig/base.json",
   "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@pyright/*": ["../../node_modules/@zzzen/pyright-internal/dist/*"]
-    }
   },
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]

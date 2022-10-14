@@ -1,6 +1,6 @@
 import { RuleModule } from "../../rule";
 import noExplicitAny from "../../rules/no-explicit-any";
-import { runRuleTest } from "../ruleTester";
+import { runRuleTest } from "../ruleTest";
 
 runRuleTest("no-explicit-any", noExplicitAny, {
   valid: [

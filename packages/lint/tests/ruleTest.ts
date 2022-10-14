@@ -238,10 +238,12 @@ const pyrightPath = require
   .resolve("pyright/package.json")
   .replace(/package\.json$/, "");
 
-export function createProgramWithFile(content: string) {
-  const libraryRoot = combinePaths(normalizeSlashes("/"), lib, sitePackages);
 
-  const fallbackPath = combinePaths(pyrightPath, "dist", "typeshed-fallback");
+export const libraryRoot = combinePaths(normalizeSlashes("/"), lib, sitePackages);
+
+export const fallbackPath = combinePaths(pyrightPath, "dist", "typeshed-fallback");
+
+export function createProgramWithFile(content: string) {
   const typeshedFallbacks = globbySync("**/*.pyi", { cwd: fallbackPath });
 
   const typesheds: Record<string, string> = {};

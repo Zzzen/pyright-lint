@@ -26,17 +26,6 @@ export interface RuleMetaDataDocs {
    * Specifies whether the rule can return suggestions.
    */
   suggestion?: boolean;
-  /**
-   * Does the rule require us to create a full TypeScript Program in order for it
-   * to type-check code. This is only used for documentation purposes.
-   */
-  requiresTypeChecking?: boolean;
-  /**
-   * Does the rule extend (or is it based off of) an pyright-lint code rule?
-   * Alternately accepts the name of the base rule, in case the rule has been renamed.
-   * This is only used for documentation purposes.
-   */
-  extendsBaseRule?: boolean | string;
 }
 export interface RuleMetaData<TMessageIds extends string> {
   /**

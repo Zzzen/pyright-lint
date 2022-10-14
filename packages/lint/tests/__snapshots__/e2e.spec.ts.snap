@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`e2e should pass basic: basic 1`] = `
+[
+  {
+    "messageId": "unexpectedAny",
+    "node": TextRange(26, 3),
+  },
+]
+`;

@@ -1,0 +1,4 @@
+{
+    "include": "main.py",
+    "noExplicitAny": true
+}

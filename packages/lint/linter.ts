@@ -13,6 +13,13 @@ import { globbySync } from "globby";
 import rules from "./rules";
 import { ReportDescriptor, RuleContext } from "./rule";
 
+export const pyrightPath = require
+  .resolve("pyright/package.json")
+  .replace(/package\.json$/, "");
+
+//https:github.com/microsoft/pyright/blob/aad650ec373a9894c6f13490c2950398095829c6/packages/pyright/index.js#L6
+(global as any).__rootDirectory = path.join(pyrightPath, "dist");
+
 export interface LinterOption {
   projectRoot: string;
   verbose?: boolean;
@@ -26,7 +33,7 @@ export enum Severity {
 export type RuleOption = boolean | { options?: unknown[]; severity: Severity };
 
 export interface Rules {
-  noExplicitAny: boolean;
+  noExplicitAny: RuleOption;
 }
 
 interface Config extends Rules {
@@ -60,11 +67,8 @@ export class Linter {
   init() {
     const dir = this.option.projectRoot;
     const fileSystem = new PyrightFileSystem(createFromRealFileSystem(console));
-    const service = new AnalyzerService(dir, fileSystem, {
-      configOptions: new ConfigOptions(dir),
-    });
+    const service = new AnalyzerService(dir, fileSystem, {});
     const options = new CommandLineOptions(dir, false);
-    options.typeshedPath = fallbackPath;
     service.setOptions(options);
     this.service = service;
 

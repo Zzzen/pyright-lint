@@ -24,6 +24,7 @@ import {
   Position,
   TextRange,
 } from "@zzzen/pyright-internal/dist/common/textRange";
+import { pyrightPath } from "../linter";
 
 export interface RunTests<
   TMessageIds extends string,
@@ -233,11 +234,6 @@ function assertIsDefined<T>(content: T | undefined): asserts content is T {
 
 const TEST_FILE_PATH = "/.src/test.py";
 const TYPESHED_PATH = "/typeshed-fallback/";
-
-const pyrightPath = require
-  .resolve("pyright/package.json")
-  .replace(/package\.json$/, "");
-
 
 export const libraryRoot = combinePaths(normalizeSlashes("/"), lib, sitePackages);
 

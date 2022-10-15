@@ -1,6 +1,34 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`e2e should pass basic: basic 1`] = `
+exports[`e2e should pass basic: basic.diagnostics 1`] = `
+[
+  {
+    "diagnostics": [
+      Diagnostic {
+        "_relatedInfo": [],
+        "_rule": "reportGeneralTypeIssues",
+        "category": 0,
+        "message": "Expression of type "Literal[2]" cannot be assigned to declared type "str"
+  "Literal[2]" is incompatible with "str"",
+        "range": {
+          "end": {
+            "character": 10,
+            "line": 2,
+          },
+          "start": {
+            "character": 9,
+            "line": 2,
+          },
+        },
+      },
+    ],
+    "filePath": "<e2eDir>/basic/main.py",
+    "version": undefined,
+  },
+]
+`;
+
+exports[`e2e should pass basic: basic.errors 1`] = `
 [
   {
     "messageId": "unexpectedAny",

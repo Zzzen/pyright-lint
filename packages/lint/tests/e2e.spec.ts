@@ -1,3 +1,4 @@
+import { FileDiagnostics } from "@zzzen/pyright-internal/dist/common/diagnosticSink";
 import * as fs from "fs";
 import * as path from "path";
 import { Linter } from "../linter";
@@ -18,17 +19,20 @@ describe("e2e", () => {
     it("should pass " + dirName, (done) => {
       const linter = new Linter({ projectRoot: dir });
       const service = linter.service;
-      // service.setCompletionCallback(cb => {
-      //   console.log({
-      //     diagnostics: cb.diagnostics,
-      //   })
-      //   done()
-      // })
-      while (service.backgroundAnalysisProgram.program.analyze()) {}
-      // const files = globbySync(appliedConfig.include, {})
-      const errors = linter.lintFiles();
-      expect(errors).toMatchSnapshot(dirName);
-      done();
+      service.setCompletionCallback(result => {
+        expect(result.diagnostics.map(formatDiagnostic)).toMatchSnapshot(dirName + '.diagnostics');
+        const errors = linter.lintFiles();
+        expect(errors).toMatchSnapshot(dirName + '.errors');
+        done()
+      })
     });
   }
 });
+
+function formatDiagnostic(diagnostic: FileDiagnostics) {
+  const { filePath, ...rest } = diagnostic;
+  return {
+    ...rest,
+    filePath: filePath.replace(e2eDir, '<e2eDir>'),
+  }
+}

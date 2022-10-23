@@ -46,7 +46,6 @@ export default createNamedRule({
     },
   ],
   create(context) {
-    context.options
     return new (class Walker extends ParseTreeWalker {
       override visitTypeAnnotation(node: TypeAnnotationNode): boolean {
         if (node.typeAnnotation.nodeType === ParseNodeType.Name) {

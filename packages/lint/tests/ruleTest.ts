@@ -60,7 +60,7 @@ export interface ValidTestCase<TOptions extends Readonly<unknown[]>> {
   /**
    * Options for the test case.
    */
-  readonly options?: Readonly<TOptions>;
+  readonly options?: Readonly<Partial<TOptions>>;
   /**
    * Run this case exclusively for debugging in supported test frameworks.
    * @since 7.29.0

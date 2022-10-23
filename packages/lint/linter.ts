@@ -12,6 +12,7 @@ export const configFileNames = ["pyright-lint.config.json"];
 import { globbySync } from "globby";
 import rules from "./rules";
 import { ReportDescriptor, RuleContext } from "./rule";
+import { NullConsole } from "@zzzen/pyright-internal/dist/common/console";
 
 export const pyrightPath = require
   .resolve("pyright/package.json")
@@ -66,7 +67,7 @@ export class Linter {
 
   init() {
     const dir = this.option.projectRoot;
-    const fileSystem = new PyrightFileSystem(createFromRealFileSystem(console));
+    const fileSystem = new PyrightFileSystem(createFromRealFileSystem(new NullConsole()));
     const service = new AnalyzerService(dir, fileSystem, {});
     const options = new CommandLineOptions(dir, false);
     service.setOptions(options);

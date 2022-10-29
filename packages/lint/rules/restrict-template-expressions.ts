@@ -16,7 +16,7 @@ import {
 } from "@zzzen/pyright-internal/dist/analyzer/typeUtils";
 
 export default createNamedRule({
-  name: "restrict-template-expressions",
+  name: "restrictTemplateExpressions",
   meta: {
     type: "problem",
     docs: {

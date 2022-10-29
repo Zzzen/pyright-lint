@@ -19,7 +19,7 @@ import { OperatorType } from "@zzzen/pyright-internal/dist/parser/tokenizerTypes
 import { createNamedRule } from "../utils/createRule";
 
 export default createNamedRule({
-  name: "no-misused-awaitable",
+  name: "noMisusedAwaitable",
   meta: {
     type: "problem",
     docs: {

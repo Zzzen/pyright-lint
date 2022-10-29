@@ -7,7 +7,7 @@ import {
 import { createNamedRule } from "../utils/createRule";
 
 export default createNamedRule({
-  name: "no-explicit-any",
+  name: "noExplicitAny",
   meta: {
     type: "suggestion",
     docs: {

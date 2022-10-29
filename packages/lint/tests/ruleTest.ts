@@ -26,6 +26,11 @@ import {
 } from "@zzzen/pyright-internal/dist/common/textRange";
 import { pyrightPath } from "../linter";
 
+// TODO: this is not required in ts-eslint, why?
+type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
+
 export interface RunTests<
   TMessageIds extends string,
   TOptions extends Readonly<unknown[]>
@@ -60,7 +65,7 @@ export interface ValidTestCase<TOptions extends Readonly<unknown[]>> {
   /**
    * Options for the test case.
    */
-  readonly options?: Readonly<Partial<TOptions>>;
+  readonly options?: Readonly<DeepPartial<TOptions>>;
   /**
    * Run this case exclusively for debugging in supported test frameworks.
    * @since 7.29.0
@@ -217,7 +222,7 @@ export function runRuleTest<
   }
 }
 
-function getStartPositionFromReport(
+export function getStartPositionFromReport(
   report: ReportDescriptor<string>,
   lines: TextRangeCollection<TextRange>
 ): Position {

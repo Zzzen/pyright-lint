@@ -1,2 +1,2 @@
 [tool.pyright]
-include = ["main.py"]
+include = ["*.py"]

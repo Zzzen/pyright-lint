@@ -1,4 +1,4 @@
 {
-    "include": "main.py",
+    "include": "*.py",
     "noExplicitAny": true
 }

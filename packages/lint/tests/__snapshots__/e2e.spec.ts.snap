@@ -3,6 +3,11 @@
 exports[`e2e should pass basic: basic.diagnostics 1`] = `
 [
   {
+    "diagnostics": [],
+    "filePath": "<e2eDir>/basic/ignored.py",
+    "version": undefined,
+  },
+  {
     "diagnostics": [
       Diagnostic {
         "_relatedInfo": [],

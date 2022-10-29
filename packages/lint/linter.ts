@@ -7,12 +7,14 @@ import { createFromRealFileSystem } from "@zzzen/pyright-internal/dist/common/re
 import { PyrightFileSystem } from "@zzzen/pyright-internal/dist/pyrightFileSystem";
 import * as fs from "fs";
 import * as path from "path";
-import { fallbackPath } from "./tests/ruleTest";
+import { getStartPositionFromReport } from "./tests/ruleTest";
 export const configFileNames = ["pyright-lint.config.json"];
 import { globbySync } from "globby";
 import rules from "./rules";
 import { ReportDescriptor, RuleContext } from "./rule";
 import { NullConsole } from "@zzzen/pyright-internal/dist/common/console";
+import { ParseResults } from "@zzzen/pyright-internal/dist/parser/parser";
+import { convertOffsetToPosition } from "@zzzen/pyright-internal/dist/common/positionUtils";
 
 export const pyrightPath = require
   .resolve("pyright/package.json")
@@ -58,6 +60,11 @@ export class Linter {
   service!: AnalyzerService;
   config!: Config;
 
+  private ignoreLinesCache = new WeakMap<
+    ParseResults,
+    Map<number, Array<keyof Rules> | undefined>
+  >();
+
   static createProgram() {}
 
   constructor(option: LinterOption) {
@@ -67,7 +74,9 @@ export class Linter {
 
   init() {
     const dir = this.option.projectRoot;
-    const fileSystem = new PyrightFileSystem(createFromRealFileSystem(new NullConsole()));
+    const fileSystem = new PyrightFileSystem(
+      createFromRealFileSystem(new NullConsole())
+    );
     const service = new AnalyzerService(dir, fileSystem, {});
     const options = new CommandLineOptions(dir, false);
     service.setOptions(options);
@@ -80,6 +89,44 @@ export class Linter {
     this.config = config;
   }
 
+  private getIgnoresOfFile(filePath: string) {
+    const parseResult = this.service.backgroundAnalysisProgram.program
+      .getSourceFile(filePath)
+      ?.getParseResults();
+    if (!parseResult) {
+      return undefined;
+    }
+    if (parseResult && this.ignoreLinesCache.has(parseResult)) {
+      return this.ignoreLinesCache.get(parseResult);
+    }
+    const ignoreLines = new Map<number, Array<keyof Rules> | undefined>();
+
+    for (let pos = 0; pos < parseResult.tokenizerOutput.tokens.count; pos++) {
+      const token = parseResult.tokenizerOutput.tokens.getItemAt(pos);
+      if (!token.comments) {
+        continue;
+      }
+      for (const comment of token.comments) {
+        const match = comment.value.match(
+          /^\s*pyright-lint:\s*ignore(\s*\[([\s*\w-,]*)\]|\s|$)/
+        );
+        if (!match) {
+          continue;
+        }
+        const rules = match[2].split(",").map((x) => x.trim()) as Array<
+          keyof Rules
+        >;
+        const line = convertOffsetToPosition(
+          comment.start,
+          parseResult.tokenizerOutput.lines
+        ).line;
+        ignoreLines.set(line, rules);
+      }
+    }
+    this.ignoreLinesCache.set(parseResult, ignoreLines);
+    return ignoreLines;
+  }
+
   lintFiles() {
     const files = this.getMatchingFiles();
     if (!files.length) {
@@ -89,9 +136,13 @@ export class Linter {
 
     for (const file of files) {
       const program = this.service.backgroundAnalysisProgram.program;
-      const ast = program.getSourceFile(file)?.getParseResults()?.parseTree;
+      const parseResult = program.getSourceFile(file)?.getParseResults();
+      const ast = parseResult?.parseTree;
       if (!ast) {
         console.error("file is not inclued by pyright", file);
+        continue;
+      }
+      if (parseResult.tokenizerOutput.typeIgnoreAll) {
         continue;
       }
 
@@ -103,7 +154,28 @@ export class Linter {
             id: ruleName,
             options: [],
             program,
-            report(descriptor) {
+            report: (descriptor) => {
+              const pos = getStartPositionFromReport(
+                descriptor,
+                parseResult.tokenizerOutput.lines
+              );
+
+              if (
+                parseResult.tokenizerOutput.typeIgnoreLines.has(pos.line) ||
+                parseResult.tokenizerOutput.pyrightIgnoreLines.has(pos.line)
+              ) {
+                return;
+              }
+
+              const ignoreLines = this.getIgnoresOfFile(file);
+              if (ignoreLines) {
+                if (ignoreLines.has(pos.line)) {
+                  const rules = ignoreLines.get(pos.line);
+                  if (!rules || rules.includes(ruleName as keyof Rules)) {
+                    return;
+                  }
+                }
+              }
               errors.push(descriptor);
             },
           };

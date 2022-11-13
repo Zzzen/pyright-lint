@@ -7,14 +7,14 @@ import { createFromRealFileSystem } from "@zzzen/pyright-internal/dist/common/re
 import { PyrightFileSystem } from "@zzzen/pyright-internal/dist/pyrightFileSystem";
 import * as fs from "fs";
 import * as path from "path";
-import { getStartPositionFromReport } from "./tests/ruleTest";
 export const configFileNames = ["pyright-lint.config.json"];
-import { globbySync } from "globby";
+import * as fg from 'fast-glob';
 import rules from "./rules";
 import { ReportDescriptor, RuleContext } from "./rule";
 import { NullConsole } from "@zzzen/pyright-internal/dist/common/console";
 import { ParseResults } from "@zzzen/pyright-internal/dist/parser/parser";
 import { convertOffsetToPosition } from "@zzzen/pyright-internal/dist/common/positionUtils";
+import { ErrorMessage, formatErrorDescriptor, getStartPositionFromReport } from "./utils/ast";
 
 export const pyrightPath = require
   .resolve("pyright/package.json")
@@ -36,7 +36,7 @@ export enum Severity {
 export type RuleOption = boolean | { options?: unknown[]; severity: Severity };
 
 export interface Rules {
-  noExplicitAny: RuleOption;
+  noExplicitAny?: RuleOption;
 }
 
 interface Config extends Rules {
@@ -84,9 +84,10 @@ export class Linter {
 
     const config = this.readConfig(dir);
     if (!config) {
-      throw new Error("no config found for " + dir);
+      // throw new Error("no config found for " + dir);
+      console.log('no config found for ' + dir);
     }
-    this.config = config;
+    this.config = config || { include: [] };
   }
 
   private getIgnoresOfFile(filePath: string) {
@@ -127,60 +128,68 @@ export class Linter {
     return ignoreLines;
   }
 
-  lintFiles() {
+  lintFiles(): ErrorMessage[] {
     const files = this.getMatchingFiles();
     if (!files.length) {
       throw new Error("no files found for " + this.option.projectRoot);
     }
-    const errors: Array<ReportDescriptor<string>> = [];
+    let errors: Array<ErrorMessage> = [];
 
     for (const file of files) {
-      const program = this.service.backgroundAnalysisProgram.program;
-      const parseResult = program.getSourceFile(file)?.getParseResults();
-      const ast = parseResult?.parseTree;
-      if (!ast) {
-        console.error("file is not inclued by pyright", file);
-        continue;
-      }
-      if (parseResult.tokenizerOutput.typeIgnoreAll) {
-        continue;
-      }
+      errors = errors.concat(this.lintFile(file) || []);
+    }
 
-      for (const [ruleName, rule] of Object.entries(rules)) {
-        const active = this.config[ruleName as keyof Rules];
+    return errors;
+  }
 
-        if (active) {
-          const context: RuleContext<string, any[]> = {
-            id: ruleName,
-            options: [],
-            program,
-            report: (descriptor) => {
-              const pos = getStartPositionFromReport(
-                descriptor,
-                parseResult.tokenizerOutput.lines
-              );
+  lintFile(file: string): ErrorMessage[] | undefined {
+    const errors: Array<ErrorMessage> = [];
 
-              if (
-                parseResult.tokenizerOutput.typeIgnoreLines.has(pos.line) ||
-                parseResult.tokenizerOutput.pyrightIgnoreLines.has(pos.line)
-              ) {
-                return;
-              }
+    const program = this.service.backgroundAnalysisProgram.program;
+    const parseResult = program.getSourceFile(file)?.getParseResults();
+    const ast = parseResult?.parseTree;
+    if (!ast) {
+      console.error("file is not inclued by pyright", file);
+      return;
+    }
+    if (parseResult.tokenizerOutput.typeIgnoreAll) {
+      return;
+    }
 
-              const ignoreLines = this.getIgnoresOfFile(file);
-              if (ignoreLines) {
-                if (ignoreLines.has(pos.line)) {
-                  const rules = ignoreLines.get(pos.line);
-                  if (!rules || rules.includes(ruleName as keyof Rules)) {
-                    return;
-                  }
+    for (const [ruleName, rule] of Object.entries(rules)) {
+      const active = this.config[ruleName as keyof Rules];
+
+      if (active) {
+        const context: RuleContext<string, any[]> = {
+          id: ruleName,
+          options: [],
+          program,
+          report: (descriptor) => {
+            const pos = getStartPositionFromReport(
+              descriptor,
+              parseResult.tokenizerOutput.lines
+            );
+
+            if (
+              parseResult.tokenizerOutput.typeIgnoreLines.has(pos.line) ||
+              parseResult.tokenizerOutput.pyrightIgnoreLines.has(pos.line)
+            ) {
+              return;
+            }
+
+            const ignoreLines = this.getIgnoresOfFile(file);
+            if (ignoreLines) {
+              if (ignoreLines.has(pos.line)) {
+                const rules = ignoreLines.get(pos.line);
+                if (!rules || rules.includes(ruleName as keyof Rules)) {
+                  return;
                 }
               }
-              errors.push(descriptor);
-            },
-          };
-          rule.create(context).walk(ast);
-        }
+            }
+            errors.push(formatErrorDescriptor(descriptor, parseResult.tokenizerOutput.lines));
+          },
+        };
+        rule.create(context).walk(ast);
       }
     }
 
@@ -207,7 +216,7 @@ export class Linter {
 
   getMatchingFiles() {
     const { include, exclude } = this.config;
-    const files = globbySync(include, {
+    const files = fg.sync(include, {
       ...(exclude
         ? { ignore: Array.isArray(exclude) ? exclude : [exclude] }
         : {}),
@@ -215,5 +224,9 @@ export class Linter {
     });
 
     return files.map((f) => path.join(this.option.projectRoot, f));
+  }
+
+  dispose() {
+    this.service.dispose();
   }
 }

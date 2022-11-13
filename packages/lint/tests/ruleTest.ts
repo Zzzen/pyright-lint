@@ -17,7 +17,7 @@ import { PyrightFileSystem } from "@zzzen/pyright-internal/dist/pyrightFileSyste
 import { Program } from "@zzzen/pyright-internal/dist/analyzer/program";
 import { TestAccessHost } from "@zzzen/pyright-internal/dist/tests/harness/testAccessHost";
 import { convertOffsetToPosition } from "@zzzen/pyright-internal/dist/common/positionUtils";
-import { globbySync } from "globby";
+import * as fg from "fast-glob";
 import * as fs from "fs";
 import { TextRangeCollection } from "@zzzen/pyright-internal/dist/common/textRangeCollection";
 import {
@@ -25,6 +25,7 @@ import {
   TextRange,
 } from "@zzzen/pyright-internal/dist/common/textRange";
 import { pyrightPath } from "../linter";
+import { getStartPositionFromReport } from "../utils/ast";
 
 // TODO: this is not required in ts-eslint, why?
 type DeepPartial<T> = T extends object ? {
@@ -222,17 +223,6 @@ export function runRuleTest<
   }
 }
 
-export function getStartPositionFromReport(
-  report: ReportDescriptor<string>,
-  lines: TextRangeCollection<TextRange>
-): Position {
-  if ("node" in report) {
-    return convertOffsetToPosition(report.node.start, lines);
-  } else {
-    return report.loc;
-  }
-}
-
 function assertIsDefined<T>(content: T | undefined): asserts content is T {
   expect(content).toBeDefined();
 }
@@ -245,7 +235,7 @@ export const libraryRoot = combinePaths(normalizeSlashes("/"), lib, sitePackages
 export const fallbackPath = combinePaths(pyrightPath, "dist", "typeshed-fallback");
 
 export function createProgramWithFile(content: string) {
-  const typeshedFallbacks = globbySync("**/*.pyi", { cwd: fallbackPath });
+  const typeshedFallbacks = fg.sync("**/*.pyi", { cwd: fallbackPath });
 
   const typesheds: Record<string, string> = {};
   for (const file of typeshedFallbacks) {

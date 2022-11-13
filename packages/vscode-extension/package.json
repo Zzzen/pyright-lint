@@ -1,0 +1,18 @@
+{
+  "name": "pyright-lint-extension",
+  "version": "0.0.1",
+  "main": "./client/dist/extension",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+		"vscode": "^1.63.0"
+	},
+  "activationEvents": [
+		"onLanguage:python"
+	],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

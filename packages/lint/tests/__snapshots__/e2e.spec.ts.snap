@@ -36,8 +36,8 @@ exports[`e2e should pass basic: basic.diagnostics 1`] = `
 exports[`e2e should pass basic: basic.errors 1`] = `
 [
   {
-    "messageId": "unexpectedAny",
-    "node": TextRange(26, 3),
+    "message": "unexpectedAny",
+    "range": TextRange(26, 3),
   },
 ]
 `;

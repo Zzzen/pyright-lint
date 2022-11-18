@@ -8,13 +8,17 @@ import { PyrightFileSystem } from "@zzzen/pyright-internal/dist/pyrightFileSyste
 import * as fs from "fs";
 import * as path from "path";
 export const configFileNames = ["pyright-lint.config.json"];
-import * as fg from 'fast-glob';
+import * as fg from "fast-glob";
 import rules from "./rules";
 import { ReportDescriptor, RuleContext } from "./rule";
 import { NullConsole } from "@zzzen/pyright-internal/dist/common/console";
 import { ParseResults } from "@zzzen/pyright-internal/dist/parser/parser";
 import { convertOffsetToPosition } from "@zzzen/pyright-internal/dist/common/positionUtils";
-import { ErrorMessage, formatErrorDescriptor, getStartPositionFromReport } from "./utils/ast";
+import {
+  ErrorMessage,
+  formatErrorDescriptor,
+  getStartPositionFromReport,
+} from "./utils/ast";
 
 export const pyrightPath = require
   .resolve("pyright/package.json")
@@ -85,7 +89,7 @@ export class Linter {
     const config = this.readConfig(dir);
     if (!config) {
       // throw new Error("no config found for " + dir);
-      console.log('no config found for ' + dir);
+      console.log("no config found for " + dir);
     }
     this.config = config || { include: [] };
   }
@@ -142,6 +146,18 @@ export class Linter {
     return errors;
   }
 
+  setFileOpen(path: string, version: number, content: string) {
+    this.service.setFileOpened(path, version, content);
+    this.forceAnalysis();
+  }
+
+  setFileClose(path: string) {
+    this.service.setFileClosed(path);
+  }
+
+  forceAnalysis() {
+    return this.service.backgroundAnalysisProgram.program.analyze();
+  }
   lintFile(file: string): ErrorMessage[] | undefined {
     const errors: Array<ErrorMessage> = [];
 
@@ -149,7 +165,10 @@ export class Linter {
     const parseResult = program.getSourceFile(file)?.getParseResults();
     const ast = parseResult?.parseTree;
     if (!ast) {
-      console.error("file is not inclued by pyright", file);
+      console.error(
+        "Ast not found. Maybe file is not included by pyright",
+        file
+      );
       return;
     }
     if (parseResult.tokenizerOutput.typeIgnoreAll) {
@@ -186,7 +205,12 @@ export class Linter {
                 }
               }
             }
-            errors.push(formatErrorDescriptor(descriptor, parseResult.tokenizerOutput.lines));
+            errors.push(
+              formatErrorDescriptor(
+                descriptor,
+                parseResult.tokenizerOutput.lines
+              )
+            );
           },
         };
         rule.create(context).walk(ast);

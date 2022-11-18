@@ -10,12 +10,11 @@ import {
   ProposedFeatures,
   InitializeParams,
   DidChangeConfigurationNotification,
-  CompletionItem,
-  CompletionItemKind,
-  TextDocumentPositionParams,
   TextDocumentSyncKind,
   InitializeResult,
   WorkspaceFolder,
+  TextDocumentPositionParams,
+  CompletionItem,
 } from "vscode-languageserver/node";
 
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -34,11 +33,9 @@ let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
 /**
- * key contains uri schema, e.g. file://
+ * key contains uri scheme, e.g. file://
  */
 const rootToLinter = new Map<string, Linter>();
-
-function handleWorkSpaceChange() {}
 
 connection.onInitialize((params: InitializeParams) => {
   const capabilities = params.capabilities;
@@ -85,33 +82,35 @@ connection.onInitialized(() => {
     );
   }
   if (hasWorkspaceFolderCapability) {
-    connection.workspace.onDidChangeWorkspaceFolders((_event) => {
+    connection.workspace.onDidChangeWorkspaceFolders((event) => {
       connection.console.log("Workspace folder change event received.");
-      _event.removed.forEach((folder) => {
+      event.removed.forEach((folder) => {
         const linter = rootToLinter.get(folder.uri);
         if (linter) {
           linter.dispose();
           rootToLinter.delete(folder.uri);
         }
       });
-      _event.added.forEach((folder) => {
-        addLinter(folder);
+      event.added.forEach((folder) => {
+        initLinter(folder);
       });
     });
   }
   connection.workspace.getWorkspaceFolders().then((folders) => {
     folders?.forEach((folder) => {
-      addLinter(folder);
+      initLinter(folder);
     });
+    documents.all().forEach(validateTextDocument);
   });
 });
 
-function addLinter(folder: WorkspaceFolder) {
+function initLinter(folder: WorkspaceFolder) {
   if (!folder.uri.startsWith("file://")) {
     return;
   }
+  connection.console.log("Adding linter for " + folder.uri);
   const linter = new Linter({
-    projectRoot: folder.uri.replace("file://", ""),
+    projectRoot: withoutUriScheme(folder.uri),
   });
   rootToLinter.set(folder.uri, linter);
   return linter;
@@ -163,29 +162,37 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 // Only keep settings for open documents
 documents.onDidClose((e) => {
   documentSettings.delete(e.document.uri);
+
+  const linter = getLinterByFilePath(e.document.uri);
+  if (linter) {
+    linter.setFileClose(withoutUriScheme(e.document.uri));
+  }
 });
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent((change) => {
+  // TODO: linter might not be ready yet when file is opened the first time
+  const linter = getLinterByFilePath(change.document.uri);
+  if (!linter) {
+    return;
+  }
+  linter.setFileOpen(withoutUriScheme(change.document.uri), change.document.version, change.document.getText());
   validateTextDocument(change.document);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-  const root = Array.from(rootToLinter.keys()).find((x) =>
-  textDocument.uri.startsWith(x)
-  );
-  if (!root) {
-    connection.console.log("No root found for " + textDocument.uri);
-    return;
+  const linter = getLinterByFilePath(textDocument.uri);
+  if (linter) {
+    linter.setFileOpen(withoutUriScheme(textDocument.uri), textDocument.version, textDocument.getText());
   }
+  connection.console.log('validateTextDocument: ' + textDocument.uri + ' linter: ' + !!linter);
+  const errors = linter?.lintFile(withoutUriScheme(textDocument.uri));
 
-  const linter = rootToLinter.get(root)!;
-
-  const errors = linter.lintFile(textDocument.uri.replace("file://", ""));
-
+  
   if (!errors?.length) {
-    return
+  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: [] });
+  return;
   }
 
   const diagnostics: Diagnostic[] = errors.map((error) => {
@@ -215,16 +222,6 @@ connection.onCompletion(
     // which code complete got requested. For the example we ignore this
     // info and always provide the same completion items.
     return [
-      {
-        label: "TypeScript",
-        kind: CompletionItemKind.Text,
-        data: 1,
-      },
-      {
-        label: "JavaScript",
-        kind: CompletionItemKind.Text,
-        data: 2,
-      },
     ];
   }
 );
@@ -232,13 +229,6 @@ connection.onCompletion(
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
-  if (item.data === 1) {
-    item.detail = "TypeScript details";
-    item.documentation = "TypeScript documentation";
-  } else if (item.data === 2) {
-    item.detail = "JavaScript details";
-    item.documentation = "JavaScript documentation";
-  }
   return item;
 });
 
@@ -250,3 +240,16 @@ documents.listen(connection);
 connection.listen();
 
 connection.console.log("server started");
+
+function getLinterByFilePath(uri: string) {
+  const root = Array.from(rootToLinter.keys()).find((x) => uri.startsWith(x));
+  if (!root) {
+    connection.console.log("No linter found for " + uri);
+    return;
+  }
+  return rootToLinter.get(root)!;
+}
+
+function withoutUriScheme(uri: string) {
+  return uri.replace("file://", "");
+}

@@ -1,4 +1,1 @@
-module.exports = {
-  transformIgnorePatterns: ["/node_modules/(?!(globby|slash)/)"],
-  testTimeout: 300000,
-};
+module.exports = require('./jest.config.base');

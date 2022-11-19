@@ -6,3 +6,7 @@ z: Any = 1 # pyright-lint: ignore [noExplicitAny]
 z1: Any = 1 # type: ignore [noExplicitAny]
 z2: Any = 1 # pyright: ignore [noExplicitAny]
 z3: Any = 1 # pyright: ignore
+
+class Foo:
+    pass
+f"{Foo()}"

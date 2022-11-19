@@ -39,5 +39,9 @@ exports[`e2e should pass basic: basic.errors 1`] = `
     "message": "Unexpected any. Specify a different type.",
     "range": TextRange(26, 3),
   },
+  {
+    "message": "Invalid type "Foo" of template literal expression.",
+    "range": TextRange(239, 5),
+  },
 ]
 `;

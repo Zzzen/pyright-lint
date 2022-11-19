@@ -36,7 +36,7 @@ exports[`e2e should pass basic: basic.diagnostics 1`] = `
 exports[`e2e should pass basic: basic.errors 1`] = `
 [
   {
-    "message": "unexpectedAny",
+    "message": "Unexpected any. Specify a different type.",
     "range": TextRange(26, 3),
   },
 ]

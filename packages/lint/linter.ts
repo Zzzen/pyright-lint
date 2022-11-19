@@ -208,7 +208,8 @@ export class Linter {
             errors.push(
               formatErrorDescriptor(
                 descriptor,
-                parseResult.tokenizerOutput.lines
+                parseResult.tokenizerOutput.lines,
+                rule,
               )
             );
           },

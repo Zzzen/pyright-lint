@@ -2,15 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Jest Tests",
+      "name": "Debug E2E tests",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
         "--inspect-brk",
         "${workspaceRoot}/node_modules/.bin/jest",
-        "--runInBand"
+        "--runInBand",
+		"${fileBasename}"
       ],
-      "cwd": "${workspaceFolder}/packages/ui",
+      "cwd": "${workspaceFolder}/packages/lint",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },

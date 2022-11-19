@@ -7,7 +7,8 @@ import {
   TextRange,
 } from "@zzzen/pyright-internal/dist/common/textRange";
 import { TextRangeCollection } from "@zzzen/pyright-internal/dist/common/textRangeCollection";
-import { ReportDescriptor } from "../rule";
+import { ReportDescriptor, RuleModule } from "../rule";
+import { interpolate } from "./interpolate";
 
 export function getStartPositionFromReport(
   report: ReportDescriptor<string>,
@@ -27,7 +28,8 @@ export interface ErrorMessage {
 
 export function formatErrorDescriptor(
   descriptor: ReportDescriptor<string>,
-  lines: TextRangeCollection<TextRange>
+  lines: TextRangeCollection<TextRange>,
+  rule: RuleModule<string, any, any>
 ): ErrorMessage {
   let range: TextRange;
   if ("node" in descriptor) {
@@ -40,7 +42,7 @@ export function formatErrorDescriptor(
   }
 
   return {
-    message: descriptor.messageId,
+    message: interpolate(rule.meta.messages[descriptor.messageId], descriptor.data),
     range,
   }
 }

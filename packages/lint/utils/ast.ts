@@ -7,6 +7,8 @@ import {
   TextRange,
 } from "@zzzen/pyright-internal/dist/common/textRange";
 import { TextRangeCollection } from "@zzzen/pyright-internal/dist/common/textRangeCollection";
+import { ParseNode, ParseNodeType } from "@zzzen/pyright-internal/dist/parser/parseNodes";
+import { OperatorType } from "@zzzen/pyright-internal/dist/parser/tokenizerTypes";
 import { ReportDescriptor, RuleModule } from "../rule";
 import { interpolate } from "./interpolate";
 
@@ -45,4 +47,11 @@ export function formatErrorDescriptor(
     message: interpolate(rule.meta.messages[descriptor.messageId], descriptor.data),
     range,
   }
+}
+
+export function isPep604Union(node: ParseNode | undefined): boolean {
+  return (
+    node?.nodeType === ParseNodeType.BinaryOperation &&
+    node.operator === OperatorType.BitwiseOr
+  );
 }

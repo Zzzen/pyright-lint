@@ -1,4 +1,5 @@
 import {
+  ClassType,
   Type,
   TypeCategory,
 } from "@zzzen/pyright-internal/dist/analyzer/types";
@@ -16,4 +17,8 @@ export function booleanFilter<T>(
   value?: T
 ): value is Exclude<T, false | null | undefined | "" | 0> {
   return !!value;
+}
+
+export function builtInClassTypeIs(type: ClassType, className: string) {
+  return type.details.name === className || type.aliasName === className;
 }

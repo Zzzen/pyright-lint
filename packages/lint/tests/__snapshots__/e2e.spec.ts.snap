@@ -36,12 +36,60 @@ exports[`e2e should pass basic: basic.diagnostics 1`] = `
 exports[`e2e should pass basic: basic.errors 1`] = `
 [
   {
+    "fileContent": "from typing import Any
+x: Any = 1
+y: str = 2
+
+z: Any = 1 # pyright-lint: ignore [noExplicitAny]
+z1: Any = 1 # type: ignore [noExplicitAny]
+z2: Any = 1 # pyright: ignore [noExplicitAny]
+z3: Any = 1 # pyright: ignore
+
+class Foo:
+    pass
+f"{Foo()}"
+",
+    "filename": "<e2eDir>/basic/main.py",
     "message": "Unexpected any. Specify a different type.",
-    "range": TextRange(26, 3),
+    "range": {
+      "end": {
+        "character": 6,
+        "line": 1,
+      },
+      "start": {
+        "character": 3,
+        "line": 1,
+      },
+    },
+    "textRange": TextRange(26, 3),
   },
   {
+    "fileContent": "from typing import Any
+x: Any = 1
+y: str = 2
+
+z: Any = 1 # pyright-lint: ignore [noExplicitAny]
+z1: Any = 1 # type: ignore [noExplicitAny]
+z2: Any = 1 # pyright: ignore [noExplicitAny]
+z3: Any = 1 # pyright: ignore
+
+class Foo:
+    pass
+f"{Foo()}"
+",
+    "filename": "<e2eDir>/basic/main.py",
     "message": "Invalid type "Foo" of template literal expression.",
-    "range": TextRange(239, 5),
+    "range": {
+      "end": {
+        "character": 8,
+        "line": 11,
+      },
+      "start": {
+        "character": 3,
+        "line": 11,
+      },
+    },
+    "textRange": TextRange(239, 5),
   },
 ]
 `;

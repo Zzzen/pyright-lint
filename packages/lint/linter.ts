@@ -162,9 +162,10 @@ export class Linter {
     const errors: Array<ErrorMessage> = [];
 
     const program = this.service.backgroundAnalysisProgram.program;
-    const parseResult = program.getSourceFile(file)?.getParseResults();
+    const sourceFile = program.getSourceFile(file);
+    const parseResult = sourceFile?.getParseResults();
     const ast = parseResult?.parseTree;
-    if (!ast) {
+    if (!sourceFile || !ast) {
       console.error(
         "Ast not found. Maybe file is not included by pyright",
         file
@@ -207,6 +208,8 @@ export class Linter {
             }
             errors.push(
               formatErrorDescriptor(
+                file,
+                sourceFile.getFileContent() || '',
                 descriptor,
                 parseResult.tokenizerOutput.lines,
                 rule,

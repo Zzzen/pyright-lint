@@ -1,13 +1,19 @@
+import { codeFrameColumns } from "@babel/code-frame";
 import {
   convertOffsetToPosition,
   convertPositionToOffset,
 } from "@zzzen/pyright-internal/dist/common/positionUtils";
 import {
   Position,
+  positionsAreEqual,
+  Range,
   TextRange,
 } from "@zzzen/pyright-internal/dist/common/textRange";
 import { TextRangeCollection } from "@zzzen/pyright-internal/dist/common/textRangeCollection";
-import { ParseNode, ParseNodeType } from "@zzzen/pyright-internal/dist/parser/parseNodes";
+import {
+  ParseNode,
+  ParseNodeType,
+} from "@zzzen/pyright-internal/dist/parser/parseNodes";
 import { OperatorType } from "@zzzen/pyright-internal/dist/parser/tokenizerTypes";
 import { ReportDescriptor, RuleModule } from "../rule";
 import { interpolate } from "./interpolate";
@@ -24,28 +30,73 @@ export function getStartPositionFromReport(
 }
 
 export interface ErrorMessage {
+  filename: string;
+  fileContent: string;
   message: string;
-  range: TextRange;
+  textRange: TextRange;
+  range: Range;
 }
 
 export function formatErrorDescriptor(
+  filename: string,
+  fileContent: string,
   descriptor: ReportDescriptor<string>,
   lines: TextRangeCollection<TextRange>,
   rule: RuleModule<string, any, any>
 ): ErrorMessage {
-  let range: TextRange;
+  let textRange: TextRange;
+  let range: Range;
   if ("node" in descriptor) {
-    range = TextRange.create(descriptor.node.start, descriptor.node.length);
+    textRange = TextRange.create(descriptor.node.start, descriptor.node.length);
+    range = {
+      start: convertOffsetToPosition(descriptor.node.start, lines),
+      end: convertOffsetToPosition(
+        descriptor.node.start + descriptor.node.length,
+        lines
+      ),
+    };
   } else {
-    range = TextRange.create(
+    textRange = TextRange.create(
       convertPositionToOffset(descriptor.loc, lines)!,
       0
     );
+    range = {
+      start: descriptor.loc,
+      end: descriptor.loc,
+    };
   }
 
   return {
-    message: interpolate(rule.meta.messages[descriptor.messageId], descriptor.data),
+    filename,
+    fileContent,
+    message: interpolate(
+      rule.meta.messages[descriptor.messageId],
+      descriptor.data
+    ),
+    textRange: textRange,
     range,
+  };
+}
+
+export function printErrorMessage(error: ErrorMessage) {
+  return codeFrameColumns(
+    error.fileContent,
+    {
+      start: toBabelPosition(error.range.start),
+      end: positionsAreEqual(error.range.start, error.range.end)
+        ? undefined
+        : toBabelPosition(error.range.end),
+    },
+    {
+      message: error.message,
+    }
+  );
+}
+
+export function toBabelPosition(pos: Position) {
+  return {
+    line: pos.line + 1,
+    column: pos.character + 1,
   }
 }
 

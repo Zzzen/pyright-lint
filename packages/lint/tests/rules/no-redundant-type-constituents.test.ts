@@ -126,58 +126,58 @@ x3: Union[Literal["1"], str]
       ],
     },
     {
-        code: `
+      code: `
 from typing import Literal
 x0: bool | Literal[True]
 x1: Literal[False] | bool
           `,
-        errors: [
-          {
-            line: 2,
-            column: 4,
-            messageId: "literalOverridden",
-            data: {
-              literal: "True",
-              primitive: "bool",
-            },
+      errors: [
+        {
+          line: 2,
+          column: 4,
+          messageId: "literalOverridden",
+          data: {
+            literal: "True",
+            primitive: "bool",
           },
-          {
-            line: 3,
-            column: 4,
-            messageId: "literalOverridden",
-            data: {
-              literal: "False",
-              primitive: "bool",
-            },
+        },
+        {
+          line: 3,
+          column: 4,
+          messageId: "literalOverridden",
+          data: {
+            literal: "False",
+            primitive: "bool",
           },
-        ],
-      },
-      {
-        code: `
+        },
+      ],
+    },
+    {
+      code: `
 from typing import Literal
 x0: bytes | Literal[b"hello"]
 x1: Literal[b"world"] | bytes
           `,
-        errors: [
-          {
-            line: 2,
-            column: 4,
-            messageId: "literalOverridden",
-            data: {
-              literal: "b'hello'",
-              primitive: "bytes",
-            },
+      errors: [
+        {
+          line: 2,
+          column: 4,
+          messageId: "literalOverridden",
+          data: {
+            literal: "b'hello'",
+            primitive: "bytes",
           },
-          {
-            line: 3,
-            column: 4,
-            messageId: "literalOverridden",
-            data: {
-              literal: "b'world'",
-              primitive: "bytes",
-            },
+        },
+        {
+          line: 3,
+          column: 4,
+          messageId: "literalOverridden",
+          data: {
+            literal: "b'world'",
+            primitive: "bytes",
           },
-        ],
-      },
+        },
+      ],
+    },
   ],
 });

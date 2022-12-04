@@ -209,10 +209,10 @@ export class Linter {
             errors.push(
               formatErrorDescriptor(
                 file,
-                sourceFile.getFileContent() || '',
+                sourceFile.getFileContent() || "",
                 descriptor,
                 parseResult.tokenizerOutput.lines,
-                rule,
+                rule
               )
             );
           },

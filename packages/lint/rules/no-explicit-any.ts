@@ -55,9 +55,9 @@ export default createNamedRule({
               ?.category === TypeCategory.Any
           ) {
             context.report({
-                node: node.typeAnnotation,
-                messageId: "unexpectedAny",
-            })
+              node: node.typeAnnotation,
+              messageId: "unexpectedAny",
+            });
           }
         }
 

@@ -28,7 +28,8 @@ export default createNamedRule({
       suggestion: true,
     },
     messages: {
-      conditional: "Expected non-Awaitable value in a boolean conditional. Did you forget to use 'await'?",
+      conditional:
+        "Expected non-Awaitable value in a boolean conditional. Did you forget to use 'await'?",
     },
     schema: [],
   },

@@ -43,7 +43,7 @@ export interface RuleWithMetaAndName<
 }
 
 function urlCreator(_name: string) {
-    return 'https://google.com';
+  return "https://google.com";
 }
 
 export function createNamedRule<

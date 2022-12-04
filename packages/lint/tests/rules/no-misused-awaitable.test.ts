@@ -92,8 +92,8 @@ if task1:
           messageId: "conditional",
           line: 4,
           column: 3,
-        }
-      ]
+        },
+      ],
     },
     {
       code: `
@@ -156,7 +156,7 @@ if 1 or foo():
           messageId: "conditional",
           line: 4,
           column: 8,
-        }
+        },
       ],
     },
   ],

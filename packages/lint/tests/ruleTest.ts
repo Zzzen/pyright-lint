@@ -28,9 +28,11 @@ import { pyrightPath } from "../linter";
 import { getStartPositionFromReport } from "../utils/ast";
 
 // TODO: this is not required in ts-eslint, why?
-type DeepPartial<T> = T extends object ? {
-  [P in keyof T]?: DeepPartial<T[P]>;
-} : T;
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
 
 export interface RunTests<
   TMessageIds extends string,
@@ -230,9 +232,17 @@ function assertIsDefined<T>(content: T | undefined): asserts content is T {
 const TEST_FILE_PATH = "/.src/test.py";
 const TYPESHED_PATH = "/typeshed-fallback/";
 
-export const libraryRoot = combinePaths(normalizeSlashes("/"), lib, sitePackages);
+export const libraryRoot = combinePaths(
+  normalizeSlashes("/"),
+  lib,
+  sitePackages
+);
 
-export const fallbackPath = combinePaths(pyrightPath, "dist", "typeshed-fallback");
+export const fallbackPath = combinePaths(
+  pyrightPath,
+  "dist",
+  "typeshed-fallback"
+);
 
 export function createProgramWithFile(content: string) {
   const typeshedFallbacks = fg.sync("**/*.pyi", { cwd: fallbackPath });

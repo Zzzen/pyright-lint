@@ -37,21 +37,23 @@ class Foo:
       ],
     },
     {
-        code: `
+      code: `
 class Foo:
     def foo(self) -> None | "Foo":
         if 1 + 1 == 2:
             return self
         return None
         `,
-        errors: [{
-            line: 2,
-            column: 28,
-            messageId: "useSelfType",
-        }]
+      errors: [
+        {
+          line: 2,
+          column: 28,
+          messageId: "useSelfType",
+        },
+      ],
     },
     {
-        code: `
+      code: `
 from typing import Union
 class Foo:
     def foo(self) -> Union[None, "Foo"]:
@@ -59,11 +61,13 @@ class Foo:
             return self
         return None
         `,
-        errors: [{
-            line: 3,
-            column: 33,
-            messageId: "useSelfType",
-        }]
-    }
+      errors: [
+        {
+          line: 3,
+          column: 33,
+          messageId: "useSelfType",
+        },
+      ],
+    },
   ],
 });

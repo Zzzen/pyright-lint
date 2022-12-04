@@ -1,7 +1,10 @@
 import type { JSONSchema4 } from "./utils/json-schema";
 import type { Program } from "@zzzen/pyright-internal/dist/analyzer/program";
 import type { ParseTreeWalker } from "@zzzen/pyright-internal/dist/analyzer/parseTreeWalker";
-import type { Position, Range } from "@zzzen/pyright-internal/dist/common/textRange";
+import type {
+  Position,
+  Range,
+} from "@zzzen/pyright-internal/dist/common/textRange";
 import type { ParseNode } from "@zzzen/pyright-internal/dist/parser/parseNodes";
 import type { Token } from "@zzzen/pyright-internal/dist/parser/tokenizerTypes";
 

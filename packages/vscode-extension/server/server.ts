@@ -177,22 +177,31 @@ documents.onDidChangeContent((change) => {
   if (!linter) {
     return;
   }
-  linter.setFileOpen(withoutUriScheme(change.document.uri), change.document.version, change.document.getText());
+  linter.setFileOpen(
+    withoutUriScheme(change.document.uri),
+    change.document.version,
+    change.document.getText()
+  );
   validateTextDocument(change.document);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
   const linter = getLinterByFilePath(textDocument.uri);
   if (linter) {
-    linter.setFileOpen(withoutUriScheme(textDocument.uri), textDocument.version, textDocument.getText());
+    linter.setFileOpen(
+      withoutUriScheme(textDocument.uri),
+      textDocument.version,
+      textDocument.getText()
+    );
   }
-  connection.console.log('validateTextDocument: ' + textDocument.uri + ' linter: ' + !!linter);
+  connection.console.log(
+    "validateTextDocument: " + textDocument.uri + " linter: " + !!linter
+  );
   const errors = linter?.lintFile(withoutUriScheme(textDocument.uri));
 
-  
   if (!errors?.length) {
-  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: [] });
-  return;
+    connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: [] });
+    return;
   }
 
   const diagnostics: Diagnostic[] = errors.map((error) => {
@@ -221,8 +230,7 @@ connection.onCompletion(
     // The pass parameter contains the position of the text document in
     // which code complete got requested. For the example we ignore this
     // info and always provide the same completion items.
-    return [
-    ];
+    return [];
   }
 );
 

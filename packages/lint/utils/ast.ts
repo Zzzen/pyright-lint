@@ -1,4 +1,9 @@
 import { codeFrameColumns } from "@babel/code-frame";
+import { TypeEvaluator } from "@zzzen/pyright-internal/dist/analyzer/typeEvaluatorTypes";
+import {
+  ClassType,
+  TypeCategory,
+} from "@zzzen/pyright-internal/dist/analyzer/types";
 import {
   convertOffsetToPosition,
   convertPositionToOffset,
@@ -11,6 +16,8 @@ import {
 } from "@zzzen/pyright-internal/dist/common/textRange";
 import { TextRangeCollection } from "@zzzen/pyright-internal/dist/common/textRangeCollection";
 import {
+  BinaryOperationNode,
+  ExpressionNode,
   ParseNode,
   ParseNodeType,
 } from "@zzzen/pyright-internal/dist/parser/parseNodes";
@@ -97,12 +104,39 @@ export function toBabelPosition(pos: Position) {
   return {
     line: pos.line + 1,
     column: pos.character + 1,
-  }
+  };
 }
 
-export function isPep604Union(node: ParseNode | undefined): boolean {
+export function isPep604Union(
+  node: ParseNode | undefined
+): node is BinaryOperationNode {
   return (
     node?.nodeType === ParseNodeType.BinaryOperation &&
     node.operator === OperatorType.BitwiseOr
   );
+}
+
+export function findTypeNode(
+  container: ExpressionNode,
+  evaluator: TypeEvaluator | undefined,
+  cb: (node: ParseNode) => boolean
+): ParseNode | undefined {
+  if (isPep604Union(container)) {
+    const left = findTypeNode(container.leftExpression, evaluator, cb);
+    if (left) {
+      return left;
+    }
+    return findTypeNode(container.rightExpression, evaluator, cb);
+  }
+  const baseType =
+    container.nodeType === ParseNodeType.Index &&
+    evaluator?.getTypeOfExpression(container.baseExpression).type;
+  const isUnion =
+    baseType &&
+    baseType.category === TypeCategory.Class &&
+    ClassType.isBuiltIn(baseType, "Union");
+  if (isUnion) {
+    return container.items.map((node) => node.valueExpression).find(cb);
+  }
+  return cb(container) ? container : undefined;
 }

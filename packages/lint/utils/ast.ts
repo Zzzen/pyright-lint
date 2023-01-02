@@ -64,6 +64,7 @@ export function formatErrorDescriptor(
     };
   } else {
     textRange = TextRange.create(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       convertPositionToOffset(descriptor.loc, lines)!,
       0
     );

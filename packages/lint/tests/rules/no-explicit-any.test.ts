@@ -1,4 +1,3 @@
-import { RuleModule } from "../../rule";
 import noExplicitAny from "../../rules/no-explicit-any";
 import { runRuleTest } from "../ruleTest";
 

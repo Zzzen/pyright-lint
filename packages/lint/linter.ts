@@ -1,7 +1,5 @@
-import { Program } from "@zzzen/pyright-internal/dist/analyzer/program";
 import { AnalyzerService } from "@zzzen/pyright-internal/dist/analyzer/service";
 import { CommandLineOptions } from "@zzzen/pyright-internal/dist/common/commandLineOptions";
-import { ConfigOptions } from "@zzzen/pyright-internal/dist/common/configOptions";
 import { forEachAncestorDirectory } from "@zzzen/pyright-internal/dist/common/pathUtils";
 import { createFromRealFileSystem } from "@zzzen/pyright-internal/dist/common/realFileSystem";
 import { PyrightFileSystem } from "@zzzen/pyright-internal/dist/pyrightFileSystem";
@@ -10,7 +8,7 @@ import * as path from "path";
 export const configFileNames = ["pyright-lint.config.json"];
 import * as fg from "fast-glob";
 import rules from "./rules";
-import { ReportDescriptor, RuleContext } from "./rule";
+import { RuleContext } from "./rule";
 import { NullConsole } from "@zzzen/pyright-internal/dist/common/console";
 import { ParseResults } from "@zzzen/pyright-internal/dist/parser/parser";
 import { convertOffsetToPosition } from "@zzzen/pyright-internal/dist/common/positionUtils";
@@ -68,8 +66,6 @@ export class Linter {
     ParseResults,
     Map<number, Array<keyof Rules> | undefined>
   >();
-
-  static createProgram() {}
 
   constructor(option: LinterOption) {
     this.option = option;

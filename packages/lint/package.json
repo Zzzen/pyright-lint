@@ -16,7 +16,7 @@
     "@types/jest": "^29.1.1",
     "babel-jest": "^29.1.0",
     "babel-plugin-module-resolver": "^4.1.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.31.0",
     "eslint-config-custom": "*",
     "jest": "^29.1.1",
     "tsconfig": "*",

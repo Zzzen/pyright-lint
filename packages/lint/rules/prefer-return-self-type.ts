@@ -97,7 +97,7 @@ export default createNamedRule({
             return;
           }
 
-          let type = getClassType();
+          const type = getClassType();
           if (
             type &&
             returnType.category === TypeCategory.Class &&

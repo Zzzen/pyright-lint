@@ -7,11 +7,9 @@ import {
 import {
   BinaryOperationNode,
   ExpressionNode,
-  ForNode,
   IfNode,
   ParseNodeType,
   TernaryNode,
-  TypeAnnotationNode,
   UnaryOperationNode,
   WhileNode,
 } from "@zzzen/pyright-internal/dist/parser/parseNodes";

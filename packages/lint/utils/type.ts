@@ -11,6 +11,7 @@ export function everyType(type: Type, f: (t: Type) => boolean): boolean {
   return f(type);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function assertNever(_t: never) {}
 
 export function booleanFilter<T>(

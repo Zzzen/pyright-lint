@@ -16,14 +16,8 @@ import { PythonVersion } from "@zzzen/pyright-internal/dist/common/pythonVersion
 import { PyrightFileSystem } from "@zzzen/pyright-internal/dist/pyrightFileSystem";
 import { Program } from "@zzzen/pyright-internal/dist/analyzer/program";
 import { TestAccessHost } from "@zzzen/pyright-internal/dist/tests/harness/testAccessHost";
-import { convertOffsetToPosition } from "@zzzen/pyright-internal/dist/common/positionUtils";
 import * as fg from "fast-glob";
 import * as fs from "fs";
-import { TextRangeCollection } from "@zzzen/pyright-internal/dist/common/textRangeCollection";
-import {
-  Position,
-  TextRange,
-} from "@zzzen/pyright-internal/dist/common/textRange";
 import { pyrightPath } from "../linter";
 import { getStartPositionFromReport } from "../utils/ast";
 
@@ -156,7 +150,7 @@ export function runRuleTest<
   testsReadonly: RunTests<TMessageIds, TOptions>
 ): void {
   describe("name", () => {
-    testsReadonly.valid.forEach((validTest, i) => {
+    testsReadonly.valid.forEach((validTest) => {
       const code = typeof validTest === "string" ? validTest : validTest.code;
       test("validTest " + "\n" + code, () => {
         let errors: Array<ReportDescriptor<TMessageIds>>;
@@ -171,7 +165,7 @@ export function runRuleTest<
         expect(errors).toHaveLength(0);
       });
     });
-    testsReadonly.invalid.forEach((testCase, i) => {
+    testsReadonly.invalid.forEach((testCase) => {
       test("invalidTest " + "\n" + testCase.code, () => {
         const { errors, parseResult } = runTest(
           testCase.code,

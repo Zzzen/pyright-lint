@@ -208,8 +208,10 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
     return {
       severity: DiagnosticSeverity.Warning,
       range: {
-        start: textDocument.positionAt(error.range.start),
-        end: textDocument.positionAt(error.range.start + error.range.length),
+        start: textDocument.positionAt(error.textRange.start),
+        end: textDocument.positionAt(
+          error.textRange.start + error.textRange.length
+        ),
       },
       message: error.message,
       source: "pyright-lint",

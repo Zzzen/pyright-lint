@@ -1,73 +1,147 @@
-# Turborepo starter
+# Pyright Lint
 
-This is an official npm starter turborepo.
+🚧 A expremental linter based on Pyright at early stage of development. Do not use it in production. 🚧
 
-## What's inside?
+## Table of contents
 
-This turborepo uses [npm](https://www.npmjs.com/) as a package manager. It includes the following packages/apps:
+- [Available Rules](#available-rules)
+  - [consistentUnionTypeDeclarations](#consistentuniontypedeclarations)
+  - [noExplicitAny](#noexplicitany)
+  - [noMisusedAwaitable](#nomisusedawaitable)
+  - [noRedundantTypeConstituents](#noredundanttypeconstituents)
+  - [preferReturnSelfType](#preferreturnselftype)
+  - [restrictTemplateExpressions](#restricttemplateexpressions)
+- [Configuration](#configuration)
+- [Development](#development)
+  - [Setup](#setup)
+  - [Test](#test)
+  - [Lint](#lint)
+  - [Build](#build)
+- [Issues](#issues)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
-### Apps and Packages
+## Available Rules
 
-- `docs`: a [Next.js](https://nextjs.org) app
-- `web`: another [Next.js](https://nextjs.org) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
+### consistentUnionTypeDeclarations
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Require consistently using either `X | Y` or `Union[X, Y]` for union type declarations.
 
-### Utilities
+```python
+from typing import Union
+a: Union[int, float]
+# ⚠️ Use `|` instead of `Typing.Union`.
+```
 
-This turborepo has some additional tools already setup for you:
+### noExplicitAny
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+Disallow the `Any` type.
+
+```python
+a: Any
+# ⚠️ Unexpected Any. Specify a different type.
+```
+
+### noMisusedAwaitable
+
+Disallow Awaitable in places not designed to handle them.
+
+```python
+import asyncio
+async def foo():
+    pass
+if foo():
+    pass
+# ⚠️ Expected non-Awaitable value in a boolean conditional. Did you forget to use 'await'?
+```
+
+### noRedundantTypeConstituents
+
+Disallow members of unions that do nothing.
+
+```python
+foo: Any | int = 1
+# ⚠️ 'Any' overrides all other types in this union type.
+bar: int | Literal[1] = 1
+# ⚠️ 'Literal[1]' is overridden by 'int' in this union type.
+```
+
+### preferReturnSelfType
+
+Enforce that `Self` is used when only `Self` type is returned.
+
+```python
+class Foo:
+    def foo(self) -> "Foo":
+        return self
+# ⚠️ Use `Self` type instead.
+```
+
+### restrictTemplateExpressions
+
+Enforce template literal expressions to be of string type.
+
+```python
+class Foo:
+    pass
+f"{Foo()}"
+# ⚠️ Invalid type "Foo" of template literal expression.
+```
+
+## Configuration
+
+This project assumes you have configured [pyright](https://github.com/microsoft/pyright) properly.
+You can configure the rules in your `pyright-lint.config.json` file.
+
+```json
+{
+  "include": ["**/*.py"],
+  "consistentUnionTypeDeclarations": true,
+  "noExplicitAny": true,
+  "noMisusedAwaitable": true,
+  "noRedundantTypeConstituents": true,
+  "preferReturnSelfType": true,
+  "restrictTemplateExpressions": true
+}
+```
+
+## Development
+
+### Setup
+
+```bash
+npm install
+```
+
+### Test
+
+```bash
+npm run test
+```
+
+### Lint
+
+```bash
+npm run lint
+```
 
 ### Build
 
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
+```bash
 npm run build
 ```
 
-### Develop
+## Issues
 
-To develop all apps and packages, run the following command:
+if you have any questions or suggestions, please create an issue.
 
-```
-cd my-turborepo
-npm run dev
-```
+## License
 
-### Remote Caching
+MIT
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.org/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Acknowledgements
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Pipelines](https://turborepo.org/docs/core-concepts/pipelines)
-- [Caching](https://turborepo.org/docs/core-concepts/caching)
-- [Remote Caching](https://turborepo.org/docs/core-concepts/remote-caching)
-- [Scoped Tasks](https://turborepo.org/docs/core-concepts/scopes)
-- [Configuration Options](https://turborepo.org/docs/reference/configuration)
-- [CLI Usage](https://turborepo.org/docs/reference/command-line-reference)
+- [eslint](https://github.com/eslint/eslint)
+- [pyright](https://github.com/microsoft/pyright)
+- [tslint](https://github.com/palantir/tslint)
+- [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint)

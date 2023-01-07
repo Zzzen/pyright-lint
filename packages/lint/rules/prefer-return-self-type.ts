@@ -18,7 +18,7 @@ export default createNamedRule({
     type: "suggestion",
     docs: {
       description:
-        "Enforce that `Self` is used when only `Self` type is returned",
+        "Enforce that `Self` is used when only `Self` type is returned.",
       recommended: "strict",
     },
     messages: {

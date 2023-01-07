@@ -11,14 +11,14 @@ export default createNamedRule({
   meta: {
     type: "suggestion",
     docs: {
-      description: "Disallow the `any` type",
+      description: "Disallow the `Any` type.",
       recommended: "warn",
       suggestion: true,
     },
     fixable: "code",
     hasSuggestions: true,
     messages: {
-      unexpectedAny: "Unexpected any. Specify a different type.",
+      unexpectedAny: "Unexpected Any. Specify a different type.",
       suggestUnknown:
         "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct.",
       suggestNever:

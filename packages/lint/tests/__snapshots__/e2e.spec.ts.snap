@@ -50,7 +50,7 @@ class Foo:
 f"{Foo()}"
 ",
     "filename": "<e2eDir>/basic/main.py",
-    "message": "Unexpected any. Specify a different type.",
+    "message": "Unexpected Any. Specify a different type.",
     "range": {
       "end": {
         "character": 6,

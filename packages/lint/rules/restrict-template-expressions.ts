@@ -20,7 +20,7 @@ export default createNamedRule({
   meta: {
     type: "problem",
     docs: {
-      description: "",
+      description: "Enforce template literal expressions to be of string type.",
       recommended: "error",
       suggestion: true,
     },

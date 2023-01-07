@@ -27,7 +27,7 @@ export default createNamedRule({
       recommended: false,
     },
     messages: {
-      literalOverridden: `{{literal}} is overridden by {{primitive}} in this union type.`,
+      literalOverridden: `'{{literal}}' is overridden by '{{primitive}}' in this union type.`,
       overrides: `'{{typeName}}' overrides all other types in this union type.`,
     },
     schema: [],

@@ -3,14 +3,15 @@
   "version": "0.0.1",
   "main": "./client/dist/extension",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -b",
+    "dev": "tsc -b -w"
   },
   "engines": {
-		"vscode": "^1.63.0"
-	},
+    "vscode": "^1.63.0"
+  },
   "activationEvents": [
-		"onLanguage:python"
-	],
+    "onLanguage:python"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

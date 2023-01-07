@@ -21,7 +21,7 @@ export default createNamedRule({
   meta: {
     type: "problem",
     docs: {
-      description: "Disallow Awaitable in places not designed to handle them",
+      description: "Disallow Awaitable in places not designed to handle them.",
       recommended: "error",
       suggestion: true,
     },

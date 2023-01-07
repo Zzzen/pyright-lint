@@ -5,7 +5,10 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint *.ts*"
+    "build": "tsc",
+    "dev": "tsc -w",
+    "lint": "eslint *.ts*",
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

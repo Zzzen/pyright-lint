@@ -22,7 +22,7 @@ export const pyrightPath = require
   .resolve("pyright/package.json")
   .replace(/package\.json$/, "");
 
-//https:github.com/microsoft/pyright/blob/aad650ec373a9894c6f13490c2950398095829c6/packages/pyright/index.js#L6
+//https://github.com/microsoft/pyright/blob/aad650ec373a9894c6f13490c2950398095829c6/packages/pyright/index.js#L6
 (global as any).__rootDirectory = path.join(pyrightPath, "dist");
 
 export interface LinterOption {

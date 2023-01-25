@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import commandLineArgs from "command-line-args";
 import { OptionDefinition } from "command-line-args";
 
@@ -35,6 +36,7 @@ async function processArgs(): Promise<ExitStatus> {
   const optionDefinitions: OptionDefinition[] = [
     { name: "project", type: String, defaultOption: true },
     { name: "help", alias: "h", type: Boolean },
+    { name: "version", type: Boolean },
     { name: "verbose", alias: "v", type: Boolean },
   ];
   let args: any;
@@ -71,7 +73,7 @@ async function processArgs(): Promise<ExitStatus> {
   }
 
   const linter = new Linter({
-    projectRoot: path.resolve(args.project),
+    projectRoot: path.resolve(process.cwd(), args.project),
     verbose: args.verbose,
   });
   linter.forceAnalysis();

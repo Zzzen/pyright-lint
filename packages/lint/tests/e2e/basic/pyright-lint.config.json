@@ -1,5 +1,6 @@
 {
-    "include": "*.py",
-    "noExplicitAny": true,
-    "restrictTemplateExpressions": true
+  // some comments
+  "include": "*.py",
+  "noExplicitAny": true,
+  "restrictTemplateExpressions": true
 }

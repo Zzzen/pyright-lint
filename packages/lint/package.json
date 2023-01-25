@@ -32,6 +32,7 @@
     "@zzzen/pyright-internal": "^1.2.0-dev.20220925",
     "command-line-args": "^5.2.1",
     "fast-glob": "^3.2.12",
+    "jsonc-parser": "^3.2.0",
     "pyright": "^1.1.273"
   },
   "directories": {

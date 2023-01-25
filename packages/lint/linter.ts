@@ -17,6 +17,7 @@ import {
   formatErrorDescriptor,
   getStartPositionFromReport,
 } from "./utils/ast";
+import { parse } from "jsonc-parser";
 
 export const pyrightPath = require
   .resolve("pyright/package.json")
@@ -234,7 +235,7 @@ export class Linter {
     if (!configPath) {
       return undefined;
     }
-    const config: Config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const config: Config = parse(fs.readFileSync(configPath, "utf8"));
     return config;
   }
 
